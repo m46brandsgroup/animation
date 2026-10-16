@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScrollReveal</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="scroll-reveal.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #080b11;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 250vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .scroll-guide {
+      height: 75vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: #64748b;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .scroll-arrow {
+      width: 12px;
+      height: 12px;
+      border-right: 2px solid #64748b;
+      border-bottom: 2px solid #64748b;
+      transform: rotate(45deg);
+      animation: bounce 2s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(45deg);
+        opacity: 0.3;
+      }
+
+      50% {
+        transform: translateY(8px) rotate(45deg);
+        opacity: 0.9;
+      }
+    }
+
+    .reveal-container {
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 80px 28px;
+      font-size: clamp(1.8rem, 2.5vw, 2.2rem);
+      line-height: 1.5;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    [data-scroll-reveal] {
+      color: #64748b;
+    }
+
+    .bottom-spacer {
+      height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #475569;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="scroll-guide">
+    <span>Scroll down to reveal</span>
+    <div class="scroll-arrow"></div>
+  </div>
+
+  <main class="reveal-container">
+    <h2 data-scroll-reveal data-base-color="#64748b">
+      When does a man die? When he is hit by a bullet? No!
+      When he suffers a disease? No!
+      When he ate a soup made out of a poisonous mushroom? No!
+      A man dies when he is forgotten!
+    </h2>
+  </main>
+
+  <div class="bottom-spacer">
+    <span>Scroll up to reverse</span>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="scroll-reveal.js"></script>
+</body>
+
+</html>
