@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated List</title>
+  <link rel="stylesheet" href="AnimatedList.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f0d15;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div data-animated-list>
+    <div class="animated-list__item"><a href="#">Brand assets</a></div>
+    <div class="animated-list__item"><a href="#">Launch hero.png</a></div>
+    <div class="animated-list__item"><a href="#">Product tour.mp4</a></div>
+    <div class="animated-list__item"><a href="#">Pricing notes</a></div>
+    <div class="animated-list__item"><a href="#">landing-page.tsx</a></div>
+    <div class="animated-list__item"><a href="#">Onboarding flow</a></div>
+    <div class="animated-list__item"><a href="#">Ambient loop.wav</a></div>
+    <div class="animated-list__item"><a href="#">Q3 forecast</a></div>
+    <div class="animated-list__item"><a href="#">Brand guidelines.pdf</a></div>
+    <div class="animated-list__item"><a href="#">Investor update</a></div>
+    <div class="animated-list__item"><a href="#">Icon set.zip</a></div>
+    <div class="animated-list__item"><a href="#">Moodboard.jpg</a></div>
+    <div class="animated-list__item"><a href="#">Release notes</a></div>
+    <div class="animated-list__item"><a href="#">Archive</a></div>
+    <div class="animated-list__item"><a href="#">Teaser cut.mov</a></div>
+  </div>
+
+  <!-- GSAP Animation Engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script> 
+
+  <!-- AnimatedList Component -->
+  <script src="AnimatedList.js"></script>
+</body>
+
+</html>
