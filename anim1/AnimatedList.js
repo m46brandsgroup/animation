@@ -1,19 +1,9 @@
-/**
- * AnimatedList - High performance animated list with GSAP gliding indicator & on-scroll scaling
- * Can be called as a single function multiple times on any target element or selector.
- * 
- * @param {HTMLElement|string} [target='[data-animated-list]'] - Element or selector
- * @param {Object} [options={}] - Configuration options
- * @returns {Object|Array<Object>} Controller object with { select, getSelected, destroy, items }
- */
 function AnimatedList(target = '[data-animated-list]', options = {}) {
-  // Support passing options as first argument if target is an options object
   if (target && typeof target === 'object' && !(target instanceof HTMLElement)) {
     options = target;
     target = '[data-animated-list]';
   }
 
-  // Support multiple elements if selector matches more than one
   if (typeof target === 'string') {
     const selector = target.startsWith('#') || target.startsWith('.') || target.startsWith('[') || target.includes(' ')
       ? target

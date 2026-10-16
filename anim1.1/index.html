@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated List</title>
+  <link rel="stylesheet" href="AnimatedList.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #0f0d15;
+      padding: 20px;
+      color: #fff;
+      font-size: 20px;
+    }
+
+    [data-animated-list] {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: var(--al-gap);
+      width: 420px;
+      max-width: 100%;
+      padding: 6px;
+      list-style: none;
+      -webkit-backdrop-filter: blur(20px) saturate(1.6);
+      backdrop-filter: blur(20px) saturate(1.6);
+    }
+
+    [data-animated-list]>* {
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      padding: 10px 14px 10px 10px;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    a {
+      color: #fff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div data-animated-list>
+    <div><a href="#">Brand assets</a></div>
+    <div><a href="#">Launch hero.png</a></div>
+    <div><a href="#">Product tour.mp4</a></div>
+    <div><a href="#">Pricing notes</a></div>
+    <div><a href="#">landing-page.tsx</a></div>
+    <div><a href="#">Onboarding flow</a></div>
+    <div><a href="#">Ambient loop.wav</a></div>
+    <div><a href="#">Q3 forecast</a></div>
+    <div><a href="#">Brand guidedivnes.pdf</a></div>
+    <div><a href="#">Investor update</a></div>
+    <div><a href="#">Icon set.zip</a></div>
+    <div><a href="#">Moodboard.jpg</a></div>
+    <div><a href="#">Release notes</a></div>
+    <div><a href="#">Archive</a></div>
+    <div><a href="#">Teaser cut.mov</a></div>
+  </div>
+  <div style="height: 100vh">scroll more... </div>
+  <ul data-animated-list>
+    <li><a href="#">Brand assets</a></li>
+    <li><a href="#">Launch hero.png</a></li>
+    <li><a href="#">Product tour.mp4</a></li>
+    <li><a href="#">Pricing notes</a></li>
+    <li><a href="#">landing-page.tsx</a></li>
+    <li><a href="#">Onboarding flow</a></li>
+    <li><a href="#">Ambient loop.wav</a></li>
+    <li><a href="#">Q3 forecast</a></li>
+    <li><a href="#">Brand guidelines.pdf</a></li>
+    <li><a href="#">Investor update</a></li>
+    <li><a href="#">Icon set.zip</a></li>
+    <li><a href="#">Moodboard.jpg</a></li>
+    <li><a href="#">Release notes</a></li>
+    <li><a href="#">Archive</a></li>
+    <li><a href="#">Teaser cut.mov</a></li>
+  </ul>
+
+  <!-- GSAP Animation Engine & ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- AnimatedList Component -->
+  <script src="AnimatedList.js"></script>
+</body>
+
+</html>

@@ -1,4 +1,29 @@
 function initFadeContent(selector = '[data-fade-content]', globalDefaults = {}) {
+  const DEFAULT_SETTINGS = {
+    effect: 'mist',            // 'fade' | 'mist' | 'dissolve' | 'pixel' | 'focus' | 'develop'
+    duration: 1.8,             // Duration in seconds
+    ease: 'power2.out',        // Easing function
+    delay: 0,                  // Delay before start (in seconds)
+    stagger: 0.1,              // Stagger delay between child elements (in seconds)
+    staggerFrom: 'start',      // 'start' | 'center' | 'end' | 'edges' | 'random'
+    threshold: 0.1,            // Visibility threshold to trigger (0 - 1)
+    initialOpacity: 0,         // Starting opacity (0 - 1)
+    trigger: 'scroll',         // 'scroll' | 'mount'
+    once: true,                // If true, animates once; if false, reverses on scroll back
+    exit: false,               // If true, animates out when scrolling past
+    pin: false,                // Pin element during animation
+    markers: false,            // ScrollTrigger debug markers
+    scrub: false,              // Link animation progress to scrollbar (boolean or number)
+    blur: false,               // Add blur effect: boolean or number in pixels
+    disappearAfter: 0,         // Disappear after seconds (0 to disable)
+    disappearDuration: 0.5,    // Duration of disappearance animation
+    disappearEase: 'power2.in',// Easing of disappearance animation
+    container: null,           // Custom scroll container selector
+    start: null,               // Custom ScrollTrigger start position
+    end: null,                 // Custom ScrollTrigger end position
+    toggleActions: null        // Custom ScrollTrigger toggle actions
+  };
+
   if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return null;
 
   gsap.registerPlugin(ScrollTrigger);
@@ -8,7 +33,18 @@ function initFadeContent(selector = '[data-fade-content]', globalDefaults = {}) 
   const LEVELS = Array.from({ length: 33 }, (_, i) => 1 / (1 + Math.exp(-10.8 * (i / 32 - 0.5))));
   let maskCount = 0;
 
-  const toSeconds = val => (typeof val === 'number' && val > 10 ? val / 1000 : parseFloat(val) || 0);
+  const toSeconds = val => {
+    if (val === undefined || val === null || val === '') return 0;
+    if (typeof val === 'number') {
+      return val > 10 ? val / 1000 : val;
+    }
+    const str = String(val).trim();
+    const num = parseFloat(str);
+    if (isNaN(num)) return 0;
+    if (str.endsWith('ms')) return num / 1000;
+    return num > 10 && !str.endsWith('s') ? num / 1000 : num;
+  };
+
   const clamp01 = val => Math.min(Math.max(val, 0), 1);
   const smoothstep = (from, to, val) => {
     const t = clamp01((val - from) / (to - from));
@@ -133,48 +169,153 @@ function initFadeContent(selector = '[data-fade-content]', globalDefaults = {}) 
     return [{ from: { autoAlpha: initialOpacity }, to: { autoAlpha: 1 }, share: 1 }];
   };
 
+  // Helper to parse settings for a specific element:
+  // Precedence: HTML data attribute > inline data-fade-content value > passed globalDefaults > DEFAULT_SETTINGS
+  const parseElementConfig = el => {
+    const mergedDefaults = {
+      ...DEFAULT_SETTINGS,
+      ...globalDefaults
+    };
+
+    // Check if data-fade-content itself contains shorthand effect or JSON
+    const mainAttr = el.getAttribute('data-fade-content');
+    let inlineOptions = {};
+    if (mainAttr && mainAttr.trim() !== '' && mainAttr !== 'true') {
+      const trimmed = mainAttr.trim();
+      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        try {
+          inlineOptions = JSON.parse(trimmed);
+        } catch (e) {
+          console.warn('[FadeContent] Could not parse JSON from data-fade-content:', trimmed);
+        }
+      } else {
+        // Shorthand for effect, e.g. data-fade-content="mist"
+        inlineOptions = { effect: trimmed };
+      }
+    }
+
+    const ds = el.dataset;
+
+    // Retrieve value from user-defined attributes if present, otherwise default
+    const getVal = (dsKey, optKey) => {
+      // 1. Explicit dataset property (e.g. data-duration -> ds.duration)
+      if (ds[dsKey] !== undefined) return ds[dsKey];
+      // 2. Kebab-case attribute check (e.g. data-stagger-from)
+      const kebab = 'data-' + optKey.replace(/([A-Z])/g, '-$1').toLowerCase();
+      if (el.hasAttribute(kebab)) return el.getAttribute(kebab);
+      // 3. Lowercase attribute check
+      const lower = 'data-' + optKey.toLowerCase();
+      if (el.hasAttribute(lower)) return el.getAttribute(lower);
+      // 4. Inline options from data-fade-content value
+      if (inlineOptions[optKey] !== undefined) return inlineOptions[optKey];
+      // 5. Default setting
+      return mergedDefaults[optKey];
+    };
+
+    const getBool = (dsKey, optKey) => {
+      const val = getVal(dsKey, optKey);
+      if (typeof val === 'boolean') return val;
+      if (val === 'true' || val === '') return true;
+      if (val === 'false') return false;
+      return Boolean(val);
+    };
+
+    const effect = String(getVal('effect', 'effect') || 'fade');
+    const containerSelector = getVal('container', 'container') || null;
+    const duration = toSeconds(getVal('duration', 'duration')) || mergedDefaults.duration;
+    const ease = String(getVal('ease', 'ease') || 'power2.out');
+    const delay = toSeconds(getVal('delay', 'delay'));
+    const threshold = parseFloat(getVal('threshold', 'threshold')) || 0;
+    const initialOpacity = clamp01(parseFloat(getVal('initialOpacity', 'initialOpacity')) || 0);
+    const stagger = toSeconds(getVal('stagger', 'stagger'));
+    const staggerFrom = String(getVal('staggerFrom', 'staggerFrom') || 'start');
+    const trigger = String(getVal('trigger', 'trigger') || 'scroll');
+    const once = getBool('once', 'once');
+    const exit = getBool('exit', 'exit');
+    const pin = getBool('pin', 'pin');
+    const markers = getBool('markers', 'markers');
+
+    const scrubVal = getVal('scrub', 'scrub');
+    let isScrub = false;
+    if (scrubVal === 'true' || scrubVal === '' || scrubVal === true) {
+      isScrub = 1;
+    } else if (scrubVal === 'false' || scrubVal === false || scrubVal === null || scrubVal === undefined) {
+      isScrub = false;
+    } else {
+      isScrub = parseFloat(scrubVal) || true;
+    }
+
+    const disappearAfter = toSeconds(getVal('disappearAfter', 'disappearAfter'));
+    const disappearDuration = toSeconds(getVal('disappearDuration', 'disappearDuration')) || mergedDefaults.disappearDuration;
+    const disappearEase = String(getVal('disappearEase', 'disappearEase') || 'power2.in');
+
+    const blurRaw = getVal('blur', 'blur');
+    const blurAmount = blurRaw === 'true' || blurRaw === true ? 10 : Math.max(parseFloat(blurRaw) || 0, 0);
+
+    const startPos = getVal('start', 'start');
+    const endPos = getVal('end', 'end');
+    const toggleActions = getVal('toggleActions', 'toggleActions');
+
+    return {
+      effect,
+      containerSelector,
+      duration,
+      ease,
+      delay,
+      threshold,
+      initialOpacity,
+      stagger,
+      staggerFrom,
+      trigger,
+      once,
+      exit,
+      pin,
+      markers,
+      isScrub,
+      disappearAfter,
+      disappearDuration,
+      disappearEase,
+      blurAmount,
+      startPos,
+      endPos,
+      toggleActions
+    };
+  };
+
   const mm = gsap.matchMedia();
+
+  // Reduced motion preference: reveal instantly
+  mm.add('(prefers-reduced-motion: reduce)', () => {
+    const elements = typeof selector === 'string' ? document.querySelectorAll(selector) : [selector];
+    elements.forEach(el => gsap.set(el, { visibility: 'visible', opacity: 1 }));
+  });
 
   mm.add('(prefers-reduced-motion: no-preference)', () => {
     const elements = typeof selector === 'string' ? document.querySelectorAll(selector) : [selector];
 
     elements.forEach(el => {
-      const ds = el.dataset;
+      // Clean up previous instance if already initialized on this element
+      if (el._fadeContentTimeline) {
+        if (el._fadeContentTimeline.scrollTrigger) {
+          el._fadeContentTimeline.scrollTrigger.kill();
+        }
+        el._fadeContentTimeline.kill();
+      }
 
-      const effect = ds.effect || globalDefaults.effect || 'fade';
-      const containerSelector = ds.container || globalDefaults.container || null;
-      const duration = toSeconds(ds.duration ?? globalDefaults.duration ?? 1) || 1;
-      const ease = ds.ease || globalDefaults.ease || 'power2.out';
-      const delay = toSeconds(ds.delay ?? globalDefaults.delay ?? 0);
-      const threshold = parseFloat(ds.threshold ?? globalDefaults.threshold ?? '0.1');
-      const initialOpacity = clamp01(parseFloat(ds.initialOpacity ?? globalDefaults.initialOpacity ?? '0'));
-      const stagger = toSeconds(ds.stagger ?? globalDefaults.stagger ?? 0);
-      const staggerFrom = ds.staggerFrom || globalDefaults.staggerFrom || 'start';
-      const trigger = ds.trigger || globalDefaults.trigger || 'scroll';
-      const once = ds.once !== 'false' && (globalDefaults.once !== false);
-      const exit = ds.exit === 'true' || globalDefaults.exit === true;
-      const pin = ds.pin === 'true' || globalDefaults.pin === true;
-      const markers = ds.markers === 'true' || globalDefaults.markers === true;
-      const isScrub = ds.scrub !== undefined ? (ds.scrub === 'true' || ds.scrub === '' ? 1 : parseFloat(ds.scrub) || true) : (globalDefaults.scrub ?? false);
-      const disappearAfter = toSeconds(ds.disappearAfter ?? globalDefaults.disappearAfter ?? 0);
-      const disappearDuration = toSeconds(ds.disappearDuration ?? globalDefaults.disappearDuration ?? 0.5);
-      const disappearEase = ds.disappearEase || globalDefaults.disappearEase || 'power2.in';
+      const cfg = parseElementConfig(el);
 
-      const blurRaw = ds.blur ?? globalDefaults.blur ?? false;
-      const blurAmount = blurRaw === 'true' || blurRaw === true ? 10 : Math.max(parseFloat(blurRaw) || 0, 0);
-
-      const scroller = containerSelector ? document.querySelector(containerSelector) : undefined;
-      const targets = stagger > 0 && el.children.length ? Array.from(el.children) : [el];
+      const scroller = cfg.containerSelector ? document.querySelector(cfg.containerSelector) : undefined;
+      const targets = cfg.stagger > 0 && el.children.length ? Array.from(el.children) : [el];
 
       gsap.set(el, { visibility: 'visible' });
 
       let masks = [];
-      const staggerVars = stagger > 0 ? { stagger: { each: stagger, from: staggerFrom } } : {};
-      const noisy = NOISE_EFFECTS.includes(effect);
-      const looks = noisy ? [] : getLooks(effect, blurAmount, initialOpacity);
+      const staggerVars = cfg.stagger > 0 ? { stagger: { each: cfg.stagger, from: cfg.staggerFrom } } : {};
+      const noisy = NOISE_EFFECTS.includes(cfg.effect);
+      const looks = noisy ? [] : getLooks(cfg.effect, cfg.blurAmount, cfg.initialOpacity);
 
       if (noisy) {
-        masks = targets.map(t => createNoiseMask(t, effect, initialOpacity, blurAmount));
+        masks = targets.map(t => createNoiseMask(t, cfg.effect, cfg.initialOpacity, cfg.blurAmount));
       }
 
       const proxies = masks.map(m => m.state);
@@ -189,42 +330,44 @@ function initFadeContent(selector = '[data-fade-content]', globalDefaults = {}) 
         }
       };
 
-      const startPos = ds.start || globalDefaults.start || `top ${Math.round((1 - threshold) * 100)}%`;
-      const endPos = ds.end || globalDefaults.end || (exit ? `bottom ${Math.round(threshold * 100)}%` : 'bottom top');
+      const startPos = cfg.startPos || `top ${Math.round((1 - cfg.threshold) * 100)}%`;
+      const endPos = cfg.endPos || (cfg.exit ? `bottom ${Math.round(cfg.threshold * 100)}%` : 'bottom top');
 
-      let toggleActions = ds.toggleActions || globalDefaults.toggleActions;
+      let toggleActions = cfg.toggleActions;
       if (!toggleActions) {
-        if (once) {
+        if (cfg.once) {
           toggleActions = 'play none none none';
-        } else if (exit) {
+        } else if (cfg.exit) {
           toggleActions = 'play reverse play reverse';
         } else {
           toggleActions = 'play none none reverse';
         }
       }
 
-      const scrollTriggerConfig = trigger === 'mount' ? undefined : {
+      const scrollTriggerConfig = cfg.trigger === 'mount' ? undefined : {
         trigger: el,
         scroller: scroller,
         start: startPos,
         end: endPos,
-        scrub: isScrub,
-        pin: pin,
-        markers: markers,
-        toggleActions: isScrub ? undefined : toggleActions,
+        scrub: cfg.isScrub,
+        pin: cfg.pin,
+        markers: cfg.markers,
+        toggleActions: cfg.isScrub ? undefined : toggleActions,
         invalidateOnRefresh: true,
         fastScrollEnd: true,
         onLeave: () => {
-          if (!exit && once && !noisy) settle();
+          if (!cfg.exit && cfg.once && !noisy) settle();
         }
       };
 
       const tl = gsap.timeline({
         scrollTrigger: scrollTriggerConfig,
         onComplete: () => {
-          if (!exit && once && !isScrub) settle();
+          if (!cfg.exit && cfg.once && !cfg.isScrub) settle();
         }
       });
+
+      el._fadeContentTimeline = tl;
 
       if (noisy) {
         tl.fromTo(
@@ -232,12 +375,12 @@ function initFadeContent(selector = '[data-fade-content]', globalDefaults = {}) 
           { progress: 0 },
           {
             progress: 1,
-            duration: isScrub ? 1 : duration,
-            ease: isScrub ? 'none' : ease,
-            stagger: stagger > 0 ? { each: stagger, from: staggerFrom } : undefined,
+            duration: cfg.isScrub ? 1 : cfg.duration,
+            ease: cfg.isScrub ? 'none' : cfg.ease,
+            stagger: cfg.stagger > 0 ? { each: cfg.stagger, from: cfg.staggerFrom } : undefined,
             onUpdate: draw
           },
-          delay
+          cfg.delay
         );
       } else {
         looks.forEach(look => {
@@ -246,27 +389,27 @@ function initFadeContent(selector = '[data-fade-content]', globalDefaults = {}) 
             look.from,
             {
               ...look.to,
-              duration: (isScrub ? 1 : duration) * look.share,
-              ease: isScrub ? 'none' : ease,
+              duration: (cfg.isScrub ? 1 : cfg.duration) * look.share,
+              ease: cfg.isScrub ? 'none' : cfg.ease,
               ...staggerVars
             },
-            delay
+            cfg.delay
           );
         });
       }
 
-      if (disappearAfter > 0 && !isScrub && !exit) {
+      if (cfg.disappearAfter > 0 && !cfg.isScrub && !cfg.exit) {
         if (noisy) {
           tl.to(
             proxies,
             {
               progress: 0,
-              duration: disappearDuration,
-              ease: disappearEase,
-              stagger: stagger > 0 ? { each: stagger, from: staggerFrom } : undefined,
+              duration: cfg.disappearDuration,
+              ease: cfg.disappearEase,
+              stagger: cfg.stagger > 0 ? { each: cfg.stagger, from: cfg.staggerFrom } : undefined,
               onUpdate: draw
             },
-            `+=${disappearAfter}`
+            `+=${cfg.disappearAfter}`
           );
         } else {
           looks.forEach(look => {
@@ -274,17 +417,17 @@ function initFadeContent(selector = '[data-fade-content]', globalDefaults = {}) 
               targets,
               {
                 ...look.from,
-                duration: disappearDuration,
-                ease: disappearEase,
+                duration: cfg.disappearDuration,
+                ease: cfg.disappearEase,
                 ...staggerVars
               },
-              `+=${disappearAfter}`
+              `+=${cfg.disappearAfter}`
             );
           });
         }
       }
 
-      if (trigger === 'mount') {
+      if (cfg.trigger === 'mount') {
         tl.play();
       }
     });
@@ -295,6 +438,13 @@ function initFadeContent(selector = '[data-fade-content]', globalDefaults = {}) 
   return mm;
 }
 
+// Global window exposure
+if (typeof window !== 'undefined') {
+  window.FadeContent = initFadeContent;
+  window.initFadeContent = initFadeContent;
+}
+
+// Auto-run on DOM ready
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => initFadeContent('[data-fade-content]'));
@@ -303,6 +453,7 @@ if (typeof document !== 'undefined') {
   }
 }
 
+// Module export
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = initFadeContent;
 }

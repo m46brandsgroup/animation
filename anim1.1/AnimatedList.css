@@ -1,0 +1,12 @@
+[data-animated-list]  { 
+  --al-hover: brightness(1.12);
+  --al-press: brightness(0.85);
+  position: relative; 
+} 
+[data-animated-list] > *  {
+  position: relative; 
+  will-change: transform, opacity;
+  transition: filter 200ms ease;
+}
+
+  

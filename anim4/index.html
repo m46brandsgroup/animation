@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GSAP ScrollTrigger Attribute Fade-In</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="site-wrapper">
+
+    <header class="hero-section">
+      <div class="badge" data-fade-in data-mode="opacity" data-duration="0.6">
+        <span>⚡ Pure Attribute Configuration &bull; Zero IDs</span>
+      </div>
+
+      <h1 class="hero-title" data-fade-in data-mode="both" data-duration="0.9" data-offset="50">
+        Opacity-Only or Both Transform &amp; Opacity with <span class="gradient-text">GSAP &amp; ScrollTrigger</span>
+      </h1>
+
+      <p class="hero-subtitle" data-fade-in data-delay="0.15" data-duration="0.8">
+        Choose between <code>data-mode="opacity"</code> (pure fade in place) and <code>data-mode="both"</code> (transform + opacity). Omit any attribute to use the default settings automatically.
+      </p>
+
+      <div class="scroll-indicator" data-fade-in data-mode="opacity" data-delay="0.3">
+        <span>Scroll to compare animation modes</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+    </header>
+
+    <section class="section-block">
+      <div class="section-header" data-fade-in data-mode="both">
+        <p class="section-tag">Animation Channels</p>
+        <h2 class="section-title">Pure Opacity vs Transform + Opacity</h2>
+        <p class="section-desc">Easily switch between in-place fade and directional slide fade using attributes.</p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="feature-card" data-fade-in data-mode="opacity" data-duration="1.2">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </div>
+          <h3 class="card-title">Only Opacity</h3>
+          <p class="card-desc">Fades smoothly in place. Zero translation (no X or Y movement). Preserves natural layout flow.</p>
+          <span class="attr-tag">data-mode="opacity"</span>
+        </div>
+
+        <div class="feature-card" data-fade-in data-mode="both" data-offset="45" data-duration="0.9" data-delay="0.15">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="17 11 12 6 7 11"></polyline>
+              <polyline points="17 18 12 13 7 18"></polyline>
+            </svg>
+          </div>
+          <h3 class="card-title">Transform &amp; Opacity Both</h3>
+          <p class="card-desc">Combines translateY motion with opacity ramp for a dynamic, energetic entry effect.</p>
+          <span class="attr-tag">data-mode="both" (default)</span>
+        </div>
+
+        <div class="feature-card" data-fade-in data-transform="false" data-delay="0.3" data-duration="1.1">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <h3 class="card-title">Shorthand Boolean</h3>
+          <p class="card-desc">Use <code>data-transform="false"</code> or <code>data-direction="none"</code> to disable transforms.</p>
+          <span class="attr-tag">data-transform="false"</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <div class="split-grid">
+        <div class="preview-box" data-fade-in data-mode="opacity" data-duration="1.2" data-once="false">
+          <p class="section-tag">Zero Motion Fade</p>
+          <h2 class="section-title">Subtle Ambient Fade</h2>
+          <p class="card-desc">
+            Perfect for text paragraphs, quotes, and content where shifting positions might disrupt the eye.
+          </p>
+          <div>
+            <span class="attr-tag">data-mode="opacity" data-once="false"</span>
+          </div>
+        </div>
+
+        <div class="code-preview" data-fade-in data-mode="both" data-direction="left" data-offset="50" data-duration="1" data-once="false">
+&lt;div data-fade-in data-mode="opacity" data-duration="1"&gt;
+  &lt;p&gt;Fades in without movement&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div data-fade-in data-mode="both" data-offset="50" data-delay="0.2"&gt;
+  &lt;p&gt;Moves and fades together&lt;/p&gt;
+&lt;/div&gt;
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <div class="section-header" data-fade-in data-mode="both">
+        <p class="section-tag">Stagger Support</p>
+        <h2 class="section-title">Stagger with Any Mode</h2>
+        <p class="section-desc">Combine <code>data-stagger="0.15"</code> with <code>data-mode="opacity"</code> or <code>data-mode="both"</code>.</p>
+      </div>
+
+      <div class="stagger-container" data-fade-in data-mode="opacity" data-stagger="0.15" data-duration="0.8">
+        <div class="stagger-item">
+          <div class="stagger-number">01</div>
+          <div class="stagger-label">Only Opacity</div>
+        </div>
+        <div class="stagger-item">
+          <div class="stagger-number">02</div>
+          <div class="stagger-label">Transform &amp; Opacity</div>
+        </div>
+        <div class="stagger-item">
+          <div class="stagger-number">03</div>
+          <div class="stagger-label">Custom Delay / Offset</div>
+        </div>
+        <div class="stagger-item">
+          <div class="stagger-number">04</div>
+          <div class="stagger-label">Automatic Defaults</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer-bar" data-fade-in data-mode="opacity" data-duration="0.6">
+      <p>Built with GSAP 3 + ScrollTrigger &bull; Pure Attribute-Driven Architecture &bull; Zero IDs</p>
+    </footer>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="fade-in.js"></script>
+</body>
+</html>
