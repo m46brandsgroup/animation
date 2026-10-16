@@ -1,0 +1,4 @@
+[data-fade-content] {
+  visibility: hidden;
+  will-change: opacity, filter, transform;
+}
