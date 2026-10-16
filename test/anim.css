@@ -1,0 +1,52 @@
+/*--anim1--*/
+[data-animated-list]  { 
+  --al-hover: brightness(1.12);
+  --al-press: brightness(0.85);
+  position: relative; 
+} 
+[data-animated-list] > *  {
+  position: relative; 
+  will-change: transform, opacity;
+  transition: filter 200ms ease;
+}
+
+  
+  /*--anim2--*/
+  [data-scroll-reveal],
+.scroll-reveal {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.scroll-reveal-text {
+  display: block;
+}
+
+.scroll-reveal-line {
+  display: block;
+  transform-origin: 0% 50%;
+  transform-style: preserve-3d;
+  will-change: transform;
+  margin-bottom: 0.15em;
+}
+
+.scroll-reveal-word,
+.scroll-reveal-piece {
+  display: inline-block;
+}
+
+.scroll-reveal-piece {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: opacity, transform, filter, color;
+}
+/*--anim3--*/
+[data-fade-content] {
+  visibility: hidden;
+  will-change: opacity, filter, transform;
+}
+/*--anim4--*/
+[data-fade-in]{
+    opacity:0;
+}
